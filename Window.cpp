@@ -1,23 +1,23 @@
 #include "Window.h"
 
-/* 
- * Declare your variables below. Unnamed namespace is used here to avoid 
+/*
+ * Declare your variables below. Unnamed namespace is used here to avoid
  * declaring global or static variables.
  */
 namespace
 {
 	int width, height;
-	std::string windowTitle("GLFW Starter Project");
+	std::string windowTitle("GLFW Project");
 
+	Object* currentObj1;
 	Cube* cube;
-	Object* currentObj; // The object currently displaying.
-
+	
 	glm::vec3 eye(0, 0, 20); // Camera position.
 	glm::vec3 center(0, 0, 0); // The point we are looking at.
 	glm::vec3 up(0, 1, 0); // The up direction of the camera.
 	float fovy = 60;
 	float near = 1;
-	float far = 1000;
+	float far = 2000;
 	glm::mat4 view = glm::lookAt(eye, center, up); // View matrix, defined by eye, center and up.
 	glm::mat4 projection; // Projection matrix.
 
@@ -26,14 +26,16 @@ namespace
 	GLuint viewLoc; // Location of view in shader.
 	GLuint modelLoc; // Location of model in shader.
 	GLuint colorLoc; // Location of color in shader.
-};
+
+
+}
 
 bool Window::initializeProgram()
 {
 	// Create a shader program with a vertex shader and a fragment shader.
 	program = LoadShaders("shaders/shader.vert", "shaders/shader.frag");
 
-	// Check the shader program.
+	// Check the shader programs.
 	if (!program)
 	{
 		std::cerr << "Failed to initialize shader program" << std::endl;
@@ -53,11 +55,8 @@ bool Window::initializeProgram()
 
 bool Window::initializeObjects()
 {
-	// Create a cube of size 5.
-	cube = new Cube(5.0f);
-
-	// Set cube to be the first to display
-	currentObj = cube;
+	cube = new Cube(50.0f);
+	currentObj1 = cube;
 
 	return true;
 }
@@ -67,7 +66,7 @@ void Window::cleanUp()
 	// Deallcoate the objects.
 	delete cube;
 
-	// Delete the shader program.
+	// Delete the shader programs.
 	glDeleteProgram(program);
 }
 
@@ -137,6 +136,7 @@ void Window::resizeCallback(GLFWwindow* window, int w, int h)
 #endif
 	width = w;
 	height = h;
+
 	// Set the viewport size.
 	glViewport(0, 0, width, height);
 
@@ -148,24 +148,22 @@ void Window::resizeCallback(GLFWwindow* window, int w, int h)
 void Window::idleCallback()
 {
 	// Perform any updates as necessary. 
-	currentObj->update();
+	currentObj1->update();
 }
 
 void Window::displayCallback(GLFWwindow* window)
 {
-	// Clear the color and depth buffers.
+
+	glUseProgram(program);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// Specify the values of the uniform variables we are going to use.
-	glm::mat4 model = currentObj->getModel();
-	glm::vec3 color = currentObj->getColor();
 	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-	glUniform3fv(colorLoc, 1, glm::value_ptr(color));
 
-	// Render the object.
-	currentObj->draw();
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
+	currentObj1->draw();
+
+
 
 	// Gets events, including input such as keyboard and mouse or window resizing.
 	glfwPollEvents();
@@ -175,25 +173,45 @@ void Window::displayCallback(GLFWwindow* window)
 
 void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	/*
-	 * TODO: Modify below to add your key callbacks.
-	 */
-
-	 // Check for a key press.
+	// Check for a key press.
 	if (action == GLFW_PRESS)
 	{
-		switch (key)
-		{
-		case GLFW_KEY_ESCAPE:
-			// Close the window. This causes the program to also terminate.
-			glfwSetWindowShouldClose(window, GL_TRUE);
-			break;
-		case GLFW_KEY_1:
-			// Set currentObj to cube
-			currentObj = cube;
-			break;
-		default:
-			break;
+		// Uppercase key presses (shift held down + key press)
+		if (mods == GLFW_MOD_SHIFT) {
+			switch (key) {
+			default:
+				break;
+			}
+		}
+
+		// Deals with lowercase key presses
+		else {
+			switch (key)
+			{
+			case GLFW_KEY_ESCAPE:
+				// Close the window. This causes the program to also terminate.
+				glfwSetWindowShouldClose(window, GL_TRUE);
+				break;
+
+
+			case GLFW_KEY_D:
+				view = glm::rotate(glm::mat4(1.0f), 0.5f, glm::vec3(0, 1, 0)) * view;
+				break;
+
+			case GLFW_KEY_A:
+				view = glm::rotate(glm::mat4(1.0f), 0.5f, glm::vec3(0, -1, 0)) * view;
+				break;
+
+			case GLFW_KEY_S:
+				view = glm::rotate(glm::mat4(1.0f), 0.5f, glm::vec3(1, 0, 0)) * view;
+				break;
+
+			case GLFW_KEY_W:
+				view = glm::rotate(glm::mat4(1.0f), 0.5f, glm::vec3(-1, 0, 0)) * view;
+				break;
+			}
+		
 		}
 	}
 }
+

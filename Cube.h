@@ -10,6 +10,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 #include <vector>
+#include <string>
+#include <iostream>
 
 #include "Object.h"
 
@@ -18,6 +20,8 @@ class Cube : public Object
 private:
 	GLuint vao;
 	GLuint vbos[2];
+	GLuint textureID;
+
 public:
 	Cube(float size);
 	~Cube();
@@ -26,6 +30,7 @@ public:
 	void update();
 
 	void spin(float deg);
+	unsigned int loadCubemap(std::vector<std::string> faces);
 };
 
 #endif

@@ -1,4 +1,6 @@
 #include "Cube.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h";
 
 Cube::Cube(float size)
 {
@@ -23,39 +25,77 @@ Cube::Cube(float size)
 	 // The 8 vertices of a cube.
 	std::vector<glm::vec3> vertices
 	{
-		glm::vec3(-1, 1, 1),
-		glm::vec3(-1, -1, 1),
-		glm::vec3(1, -1, 1),
-		glm::vec3(1, 1, 1),
-		glm::vec3(-1, 1, -1),
-		glm::vec3(-1, -1, -1),
-		glm::vec3(1, -1, -1),
-		glm::vec3(1, 1, -1)
+		glm::vec3(-900, 900, 900),
+		glm::vec3(-900, -900, 900),
+		glm::vec3(900, -900, 900),
+		glm::vec3(900, 900, 900),
+		glm::vec3(-900, 900, -900),
+		glm::vec3(-900, -900, -900),
+		glm::vec3(900, -900, -900),
+		glm::vec3(900, 900, -900)
 	};
 
+	for (glm::vec3 v : vertices) {
+		v = v * 50.0f;
+	}
 	// Each ivec3(v1, v2, v3) define a triangle consists of vertices v1, v2 
 	// and v3 in counter-clockwise order.
 	std::vector<glm::ivec3> indices
 	{
 		// Front face.
-		glm::ivec3(0, 1, 2),
-		glm::ivec3(2, 3, 0),
+		glm::ivec3(0, 2, 1),
+		glm::ivec3(2, 0, 3),
 		// Back face.
-		glm::ivec3(7, 6, 5),
-		glm::ivec3(5, 4, 7),
+		glm::ivec3(7, 5, 6),
+		glm::ivec3(5, 7, 4),
 		// Right face.
-		glm::ivec3(3, 2, 6),
-		glm::ivec3(6, 7, 3),
+		glm::ivec3(3, 6, 2),
+		glm::ivec3(6, 3, 7),
 		// Left face.
-		glm::ivec3(4, 5, 1),
-		glm::ivec3(1, 0, 4),
+		glm::ivec3(4, 1, 5),
+		glm::ivec3(1, 4, 0),
 		// Top face.
-		glm::ivec3(4, 0, 3),
-		glm::ivec3(3, 7, 4),
+		glm::ivec3(4, 3, 0),
+		glm::ivec3(3, 4, 7),
 		// Bottom face.
-		glm::ivec3(1, 5, 6),
-		glm::ivec3(6, 2, 1),
+		glm::ivec3(1, 6, 5),
+		glm::ivec3(6, 1, 2),
+
+		/*
+		// Front face.
+		glm::ivec3(2, 1, 0),
+		glm::ivec3(0, 3, 2),
+		// Back face.
+		glm::ivec3(5, 6, 7),
+		glm::ivec3(7, 4, 5),
+		// Right face.
+		glm::ivec3(6, 2, 3),
+		glm::ivec3(3, 7, 6),
+		// Left face.
+		glm::ivec3(1, 5, 4),
+		glm::ivec3(4, 0, 1),
+		// Top face.
+		glm::ivec3(3, 0, 4),
+		glm::ivec3(4, 7, 3),
+		// Bottom face.
+		glm::ivec3(6, 5, 1),
+		glm::ivec3(1, 2, 6), */
 	};
+
+
+	// Bind textures
+	std::vector<std::string> faces = {
+		"images/right.jpg",
+		"images/left.jpg",
+		"images/top.jpg",
+		"images/base.jpg",
+		"images/front.jpg",
+		"images/back.jpg"
+	};
+
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+	textureID = loadCubemap(faces);
 
 	// Generate a vertex array (VAO) and two vertex buffer objects (VBO).
 	glGenVertexArrays(1, &vao);
@@ -91,10 +131,12 @@ Cube::~Cube()
 	// Delete the VBOs and the VAO.
 	glDeleteBuffers(2, vbos);
 	glDeleteVertexArrays(1, &vao);
+	glDeleteTextures(1, &textureID);
 }
 
 void Cube::draw()
 {
+
 	// Bind to the VAO.
 	glBindVertexArray(vao);
 	// Draw triangles using the indices in the second VBO, which is an 
@@ -113,7 +155,39 @@ void Cube::update()
 void Cube::spin(float deg)
 {
 	// Update the model matrix by multiplying a rotation matrix
-	model = glm::rotate(glm::mat4(1), glm::radians(deg), 
+	model = glm::rotate(glm::mat4(1), glm::radians(deg),
 		glm::vec3(0.0f, 1.0f, 0.0f)) * model;
 }
 
+
+unsigned int Cube::loadCubemap(std::vector<std::string> faces)
+{
+	unsigned int textureID;
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+	int width, height, nrChannels;
+	for (unsigned int i = 0; i < faces.size(); i++)
+	{
+		unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+		if (data)
+		{
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+				0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
+			);
+			stbi_image_free(data);
+		}
+		else
+		{
+			std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
+			stbi_image_free(data);
+		}
+	}
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	return textureID;
+}
