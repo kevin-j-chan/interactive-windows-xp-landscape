@@ -12,8 +12,10 @@ namespace
 	Object* currentObj1;
 	Cube* cube;
 	
-	glm::vec3 eye(0, 0, 20); // Camera position.
-	glm::vec3 center(0, 0, 0); // The point we are looking at.
+	Terrain* terrain;
+
+	glm::vec3 eye(0, 150, 100); // Camera position.
+	glm::vec3 center(0, 150, 0); // The point we are looking at.
 	glm::vec3 up(0, 1, 0); // The up direction of the camera.
 	float fovy = 60;
 	float near = 1;
@@ -21,13 +23,25 @@ namespace
 	glm::mat4 view = glm::lookAt(eye, center, up); // View matrix, defined by eye, center and up.
 	glm::mat4 projection; // Projection matrix.
 
+	float yaw = -90.0f;
+	float pitch = 0.0f;
+
 	GLuint program; // The shader program id.
+	GLuint programSkybox;
+
 	GLuint projectionLoc; // Location of projection in shader.
 	GLuint viewLoc; // Location of view in shader.
 	GLuint modelLoc; // Location of model in shader.
 	GLuint colorLoc; // Location of color in shader.
 
+	bool moveForward;
+	bool moveBack;
+	bool moveLeft;
+	bool moveRight;
 
+	bool firstMouse;
+
+	bool drawTerrain = true;
 }
 
 bool Window::initializeProgram()
@@ -50,6 +64,9 @@ bool Window::initializeProgram()
 	modelLoc = glGetUniformLocation(program, "model");
 	colorLoc = glGetUniformLocation(program, "color");
 
+	programSkybox = LoadShaders("shaders/skybox.vert", "shaders/skybox.frag");
+	glUniform1f(glGetUniformLocation(programSkybox, "skybox"), 0);
+
 	return true;
 }
 
@@ -57,6 +74,9 @@ bool Window::initializeObjects()
 {
 	cube = new Cube(50.0f);
 	currentObj1 = cube;
+
+	terrain = new Terrain();
+	terrain->generate();
 
 	return true;
 }
@@ -66,8 +86,10 @@ void Window::cleanUp()
 	// Deallcoate the objects.
 	delete cube;
 
+	delete terrain;
 	// Delete the shader programs.
 	glDeleteProgram(program);
+	glDeleteProgram(programSkybox);
 }
 
 GLFWwindow* Window::createWindow(int width, int height)
@@ -104,6 +126,8 @@ GLFWwindow* Window::createWindow(int width, int height)
 		glfwTerminate();
 		return NULL;
 	}
+
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	// Make the context of the window.
 	glfwMakeContextCurrent(window);
@@ -149,6 +173,40 @@ void Window::idleCallback()
 {
 	// Perform any updates as necessary. 
 	currentObj1->update();
+
+	glm::vec3 dir;
+	if (moveForward) {
+		dir = center - eye;
+		dir = glm::normalize(dir);
+		dir *= 0.01;
+		eye += dir;
+		center += dir;
+		view = glm::lookAt(eye, center, up);
+	}
+	if (moveBack) {
+		dir = center - eye;
+		dir = glm::normalize(dir);
+		dir *= 0.01;
+		eye -= dir;
+		center -= dir;
+		view = glm::lookAt(eye, center, up);
+	}
+	if (moveLeft) {
+		dir = center - eye;
+		dir = glm::normalize(glm::cross(dir, up));
+		dir *= 0.01;
+		eye -= dir;
+		center -= dir;
+		view = glm::lookAt(eye, center, up);
+	}
+	if (moveRight) {
+		dir = center - eye;
+		dir = glm::normalize(glm::cross(dir, up));
+		dir *= 0.01;
+		eye += dir;
+		center += dir;
+		view = glm::lookAt(eye, center, up);
+	}
 }
 
 void Window::displayCallback(GLFWwindow* window)
@@ -160,10 +218,18 @@ void Window::displayCallback(GLFWwindow* window)
 	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
+	if (drawTerrain) {
+		glm::mat4 model = glm::mat4(1);
+		model = glm::scale(glm::vec3(256.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		terrain->draw();
+	}
+
+	glUseProgram(programSkybox);
+	glUniformMatrix4fv(glGetUniformLocation(programSkybox, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+	glUniformMatrix4fv(glGetUniformLocation(programSkybox, "view"), 1, GL_FALSE, glm::value_ptr(view));
+	glUniformMatrix4fv(glGetUniformLocation(programSkybox, "model"), 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
 	currentObj1->draw();
-
-
 
 	// Gets events, including input such as keyboard and mouse or window resizing.
 	glfwPollEvents();
@@ -194,24 +260,84 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
 				break;
 
 
-			case GLFW_KEY_D:
-				view = glm::rotate(glm::mat4(1.0f), 0.5f, glm::vec3(0, 1, 0)) * view;
-				break;
-
-			case GLFW_KEY_A:
-				view = glm::rotate(glm::mat4(1.0f), 0.5f, glm::vec3(0, -1, 0)) * view;
-				break;
-
-			case GLFW_KEY_S:
-				view = glm::rotate(glm::mat4(1.0f), 0.5f, glm::vec3(1, 0, 0)) * view;
-				break;
-
 			case GLFW_KEY_W:
-				view = glm::rotate(glm::mat4(1.0f), 0.5f, glm::vec3(-1, 0, 0)) * view;
+				moveForward = true;
+				break;
+			case GLFW_KEY_S:
+				moveBack = true;
+				break;
+			case GLFW_KEY_A:
+				moveLeft = true;
+				break;
+			case GLFW_KEY_D:
+				moveRight = true;
+				break;
+			case GLFW_KEY_T:
+				terrain->generate();
+				break;
+			case GLFW_KEY_0:
+				drawTerrain = !drawTerrain;
+				break;
+			default:
 				break;
 			}
-		
+		}
+	}
+	if (action == GLFW_RELEASE)
+	{
+		switch (key)
+		{
+		case GLFW_KEY_W:
+			moveForward = false;
+			break;
+		case GLFW_KEY_S:
+			moveBack = false;
+			break;
+		case GLFW_KEY_A:
+			moveLeft = false;
+			break;
+		case GLFW_KEY_D:
+			moveRight = false;
+			break;
+		default:
+			break;
 		}
 	}
 }
 
+void Window::cursor_pos_callback(GLFWwindow* window, double xpos, double ypos) {
+	static glm::vec3 lastPoint = glm::vec3(0.0f, 0.0f, 0.0f);
+
+	if (firstMouse) {
+		lastPoint.x = xpos;
+		lastPoint.y = ypos;
+		firstMouse = false;
+	}
+
+	float xoffset = xpos - lastPoint.x;
+	float yoffset = lastPoint.y - ypos; // reversed since y-coordinates go from bottom to top
+	lastPoint.x = xpos;
+	lastPoint.y = ypos;
+
+	float sensitivity = 0.5f; // change this value to your liking
+	xoffset *= sensitivity;
+	yoffset *= sensitivity;
+
+	yaw += xoffset;
+	pitch += yoffset;
+
+	// make sure that when pitch is out of bounds, screen doesn't get flipped
+	if (pitch > 89.0f)
+		pitch = 89.0f;
+	if (pitch < -89.0f)
+		pitch = -89.0f;
+
+	glm::vec3 front;
+	front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+	front.y = sin(glm::radians(pitch));
+	front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	center = eye + glm::normalize(front);
+
+	view = glm::lookAt(eye, center, up);
+
+}

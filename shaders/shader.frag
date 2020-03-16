@@ -1,14 +1,17 @@
 #version 330 core
-out vec4 FragColor;
 
 in vec3 OurColor;
-in vec3 TexCoords;
+in vec2 terrainTexCoords;
 
-uniform samplerCube skybox;
+uniform sampler2D tex;
+
+uniform bool drawTerrain;
+
+out vec4 FragColor;
 
 void main()
 {    
-   
-    FragColor = texture(skybox, TexCoords);
+    vec3 result = OurColor;
 
+    FragColor = texture(tex, terrainTexCoords) * vec4(result, 1.0);
 }

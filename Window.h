@@ -20,6 +20,7 @@
 #include "Object.h"
 #include "Cube.h"
 #include "shader.h"
+#include "Terrain.h"
 
 class Window
 {
@@ -32,6 +33,8 @@ public:
 	static void idleCallback();
 	static void displayCallback(GLFWwindow*);
 	static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+
+	static void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos);
 };
 
 #endif
