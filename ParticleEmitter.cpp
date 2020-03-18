@@ -12,9 +12,9 @@ ParticleEmitter::ParticleEmitter(int num_particles) {
      1.0f, 0.0f, 0.0f,
      };
 
-     GLfloat particle_tex[] = {
-         0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f
-     };
+     //GLfloat particle_tex[] = {
+     //    0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f
+     //};
 
      // generate vertex array
      glGenVertexArrays(1, &vao);
@@ -28,11 +28,11 @@ ParticleEmitter::ParticleEmitter(int num_particles) {
      glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
      glBindVertexArray(0);
 
-
+     /*
      glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
      glBufferData(GL_ARRAY_BUFFER, sizeof(particle_tex), particle_tex, GL_STATIC_DRAW);
      glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
-     glBindVertexArray(1);
+     glBindVertexArray(1);*/
 
      // generate texture
      glGenTextures(1, &textureID);

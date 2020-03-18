@@ -125,7 +125,7 @@ bool Window::initializeObjects()
 
 	cloud = new Cloud();
 
-	//particleEmitter = new ParticleEmitter(500);
+	particleEmitter = new ParticleEmitter(500);
 
 	return true;
 }
@@ -136,11 +136,12 @@ void Window::cleanUp()
 	delete cube;
 	delete terrain;
 	delete cloud;
+	delete particleEmitter;
 	// Delete the shader programs.
 	glDeleteProgram(program);
 	glDeleteProgram(programSkybox);
 	glDeleteProgram(programCloud);
-	//glDeleteProgram(programParticles);
+	glDeleteProgram(programParticles);
 }
 
 GLFWwindow* Window::createWindow(int width, int height)
@@ -270,8 +271,10 @@ void Window::displayCallback(GLFWwindow* window)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
-	glUseProgram(program);
+	
+	
 
+	glUseProgram(program);
 	if (drawTerrain) {
 		glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 		glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, glm::value_ptr(view));
@@ -286,19 +289,19 @@ void Window::displayCallback(GLFWwindow* window)
 	glUniformMatrix4fv(glGetUniformLocation(programSkybox, "model"), 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
 	cube->draw();
 
+
 	
 	glUseProgram(programCloud);
 	glUniformMatrix4fv(glGetUniformLocation(programCloud, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 	glUniformMatrix4fv(glGetUniformLocation(programCloud, "view"), 1, GL_FALSE, glm::value_ptr(view));
 	glUniformMatrix4fv(glGetUniformLocation(programCloud, "model"), 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
 	cloud->draw(); 
-
-	/*
+	
 	glUseProgram(programParticles);
 	glUniformMatrix4fv(glGetUniformLocation(programParticles, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 	glUniform2f(glGetUniformLocation(programParticles, "offset"), 1, 1);
 	glUniform4f(glGetUniformLocation(programParticles, "color"), 1, 0, 0, 1);
-	particleEmitter->draw();*/
+	//particleEmitter->draw();
 	
 	// Gets events, including input such as keyboard and mouse or window resizing.
 	glfwPollEvents();
