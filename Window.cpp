@@ -54,6 +54,7 @@ namespace
 	ParticleEmitter* particleEmitter;
 	
 	bool pityPoints = false;
+	bool hideClouds = false;
 }
 
 glm::mat4 Window::view = glm::lookAt(eye, center, up); // View matrix, defined by eye, center and up.
@@ -92,6 +93,7 @@ bool Window::initializeProgram()
 		return false;
 	}
 	glUniform1f(glGetUniformLocation(programSkybox, "pityPoints"), (int)pityPoints);
+
 	/* // Program for Particles
 	programParticles = LoadShaders("shaders/particle.vert", "shaders/particle.frag");
 	if (!programParticles)
@@ -309,11 +311,13 @@ void Window::displayCallback(GLFWwindow* window)
 	glUseProgram(curveShader);
 	curve->draw(glm::mat4(1.0f));
 
-	glUseProgram(programCloud);
-	glUniformMatrix4fv(glGetUniformLocation(programCloud, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-	glUniformMatrix4fv(glGetUniformLocation(programCloud, "view"), 1, GL_FALSE, glm::value_ptr(view));
-	glUniformMatrix4fv(glGetUniformLocation(programCloud, "model"), 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
-	cloud->draw();
+	if (!hideClouds) {
+		glUseProgram(programCloud);
+		glUniformMatrix4fv(glGetUniformLocation(programCloud, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		glUniformMatrix4fv(glGetUniformLocation(programCloud, "view"), 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(glGetUniformLocation(programCloud, "model"), 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
+		cloud->draw();
+	}
 
 
 	
@@ -369,6 +373,9 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
 				break;
 			case GLFW_KEY_T:
 				terrain->generate();
+				break;
+			case GLFW_KEY_X:
+				hideClouds = hideClouds ? false : true;
 				break;
 			case GLFW_KEY_C:
 				glUniform1f(glGetUniformLocation(programCloud, "seed"), rand() % 25);
