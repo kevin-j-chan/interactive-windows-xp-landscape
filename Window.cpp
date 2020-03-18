@@ -56,11 +56,9 @@ namespace
 	bool pityPoints = false;
 }
 
-<<<<<<< HEAD
-=======
+
 glm::mat4 Window::view = glm::lookAt(eye, center, up); // View matrix, defined by eye, center and up.
 glm::mat4 Window::projection; // Projection matrix.
->>>>>>> acbee3d73e4c232f9be79219cc9133200cf989b6
 
 bool Window::initializeProgram()
 {
