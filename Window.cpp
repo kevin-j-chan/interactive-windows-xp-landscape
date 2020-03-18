@@ -12,6 +12,8 @@ namespace
 	Cube* cube;	
 	Terrain* terrain;
 	Curve* curve;
+	Curve* curveSmooth;
+	Curve* curveTech;
 
 	glm::vec3 eye(0, 150, 100); // Camera position.
 	glm::vec3 center(0, 150, 0); // The point we are looking at.
@@ -130,7 +132,9 @@ bool Window::initializeObjects()
 
 	cloud = new Cloud();
 	
-	curve = new Curve();
+	curveSmooth = new Curve(0);
+	curveTech = new Curve(1);
+	curve = curveSmooth;
 
 	particleEmitter = new ParticleEmitter(500);
 
@@ -370,6 +374,12 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
 	{
 		switch (key)
 		{
+		case GLFW_KEY_8:
+			curve = curveTech;
+			break;
+		case GLFW_KEY_9:
+			curve = curveSmooth;
+			break;		
 		case GLFW_KEY_W:
 			moveForward = false;
 			break;
