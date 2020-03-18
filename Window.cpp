@@ -66,6 +66,7 @@ bool Window::initializeProgram()
 {
 	// Create a shader program with a vertex shader and a fragment shader.
 	program = LoadShaders("shaders/shader.vert", "shaders/shader.frag");
+	curveShader = LoadShaders("shaders/curve.vert", "shaders/curve.frag");
 
 	// Check the shader programs.
 	if (!program)
