@@ -20,8 +20,6 @@ class Cloud : public Object
 private:
 	GLuint vao;
 	GLuint vbos[2];
-	
-	GLuint projectionLoc, viewLoc, modelLoc, texLoc, timeLoc;
 
 	unsigned int texture;
 	
