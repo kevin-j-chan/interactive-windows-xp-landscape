@@ -4,7 +4,7 @@
 #include <iostream>
 using namespace std;
 
-Curve::Curve()
+Curve::Curve(int version)
 {
 
     glm::mat4 B = glm::mat4(glm::vec4(-1.0f, 3.0f, -3.0f, 1.0f), 
@@ -27,10 +27,19 @@ Curve::Curve()
 	G_y[3] = glm::vec4(9.0f, 9.15f, 9.15f, 9.0f);
 
 	glm::mat4 G_z;
-	G_z[0] = glm::vec4(0.0f, 0.33f, 0.33f, 0.0f);
-	G_z[1] = glm::vec4(0.0f, 0.33f, 0.33f, 0.0f);
-	G_z[2] = glm::vec4(0.0f, 0.33f, 0.33f, 0.0f);
-	G_z[3] = glm::vec4(0.0f, 0.33f, 0.33f, 0.0f);
+	if (version == 0) {
+		
+		G_z[0] = glm::vec4(0.0f, 0.33f, 0.33f, 0.0f);
+		G_z[1] = glm::vec4(0.0f, 0.33f, 0.33f, 0.0f);
+		G_z[2] = glm::vec4(0.0f, 0.33f, 0.33f, 0.0f);
+		G_z[3] = glm::vec4(0.0f, 0.33f, 0.33f, 0.0f);
+	}
+	else {
+		G_z[0] = glm::vec4(0.0f, 0.03f, 0.03f, 0.0f);
+		G_z[1] = glm::vec4(0.0f, 0.13f, 0.13f, 0.0f);
+		G_z[2] = glm::vec4(0.0f, 0.23f, 0.23f, 0.0f);
+		G_z[3] = glm::vec4(0.0f, 0.33f, 0.33f, 0.0f);
+	}
 
 	glm::mat4 C_x = B * G_x * B;
 	glm::mat4 C_y = B * G_y * B;
@@ -72,10 +81,18 @@ Curve::Curve()
 	G_y2[3] = glm::vec4(9.0f, 8.85f, 8.85f, 9.0f);
 
 	glm::mat4 G_z2;
-	G_z2[0] = glm::vec4(0.0f, -0.33f, -0.33f, 0.0f);
-	G_z2[1] = glm::vec4(0.0f, -0.33f, -0.33f, 0.0f);
-	G_z2[2] = glm::vec4(0.0f, -0.33f, -0.33f, 0.0f);
-	G_z2[3] = glm::vec4(0.0f, -0.33f, -0.33f, 0.0f);
+	if (version == 0) {
+		G_z2[0] = glm::vec4(0.0f, -0.33f, -0.33f, 0.0f);
+		G_z2[1] = glm::vec4(0.0f, -0.33f, -0.33f, 0.0f);
+		G_z2[2] = glm::vec4(0.0f, -0.33f, -0.33f, 0.0f);
+		G_z2[3] = glm::vec4(0.0f, -0.33f, -0.33f, 0.0f);
+	}
+	else {
+		G_z2[0] = glm::vec4(0.0f, -0.03f, -0.03f, 0.0f);
+		G_z2[1] = glm::vec4(0.0f, -0.13f, -0.13f, 0.0f);
+		G_z2[2] = glm::vec4(0.0f, -0.23f, -0.23f, 0.0f);
+		G_z2[3] = glm::vec4(0.0f, -0.33f, -0.33f, 0.0f);
+	}
 
 	glm::mat4 C_x2 = B * G_x2 * B;
 	glm::mat4 C_y2 = B * G_y2 * B;
@@ -116,10 +133,19 @@ Curve::Curve()
 	G_y3[3] = glm::vec4(10.0f, 10.15f, 10.15f, 10.0f);
 
 	glm::mat4 G_z3;
-	G_z3[0] = glm::vec4(0.0f, 0.33f, 0.33f, 0.0f);
-	G_z3[1] = glm::vec4(0.0f, 0.33f, 0.33f, 0.0f);
-	G_z3[2] = glm::vec4(0.0f, 0.33f, 0.33f, 0.0f);
-	G_z3[3] = glm::vec4(0.0f, 0.33f, 0.33f, 0.0f);
+	if (version == 0) {
+		G_z3[0] = glm::vec4(0.0f, 0.33f, 0.33f, 0.0f);
+		G_z3[1] = glm::vec4(0.0f, 0.33f, 0.33f, 0.0f);
+		G_z3[2] = glm::vec4(0.0f, 0.33f, 0.33f, 0.0f);
+		G_z3[3] = glm::vec4(0.0f, 0.33f, 0.33f, 0.0f);
+	}
+	else {
+		G_z3[0] = glm::vec4(0.0f, 0.33f, 0.33f, 0.0f);
+		G_z3[1] = glm::vec4(0.0f, 0.43f, 0.43f, 0.0f);
+		G_z3[2] = glm::vec4(0.0f, 0.53f, 0.53f, 0.0f);
+		G_z3[3] = glm::vec4(0.0f, 0.63f, 0.63f, 0.0f);
+	}
+	
 
 
 	glm::mat4 C_x3 = B * G_x3 * B;
@@ -161,10 +187,18 @@ Curve::Curve()
 	G_y4[3] = glm::vec4(10.0f, 9.85f, 9.85f, 10.0f);
 
 	glm::mat4 G_z4;
-	G_z4[0] = glm::vec4(0.0f, -0.33f, -0.33f, 0.0f);
-	G_z4[1] = glm::vec4(0.0f, -0.33f, -0.33f, 0.0f);
-	G_z4[2] = glm::vec4(0.0f, -0.33f, -0.33f, 0.0f);
-	G_z4[3] = glm::vec4(0.0f, -0.33f, -0.33f, 0.0f);
+	if (version == 0) {
+		G_z4[0] = glm::vec4(0.0f, -0.33f, -0.33f, 0.0f);
+		G_z4[1] = glm::vec4(0.0f, -0.33f, -0.33f, 0.0f);
+		G_z4[2] = glm::vec4(0.0f, -0.33f, -0.33f, 0.0f);
+		G_z4[3] = glm::vec4(0.0f, -0.33f, -0.33f, 0.0f);
+	}
+	else {
+		G_z4[0] = glm::vec4(0.0f, -0.33f, -0.33f, 0.0f);
+		G_z4[1] = glm::vec4(0.0f, -0.43f, -0.43f, 0.0f);
+		G_z4[2] = glm::vec4(0.0f, -0.53f, -0.53f, 0.0f);
+		G_z4[3] = glm::vec4(0.0f, -0.63f, -0.63f, 0.0f);
+	}
 
 	glm::mat4 C_x4 = B * G_x4 * B;
 	glm::mat4 C_y4 = B * G_y4 * B;
