@@ -56,11 +56,8 @@ namespace
 	bool pityPoints = false;
 }
 
-<<<<<<< HEAD
-=======
 glm::mat4 Window::view = glm::lookAt(eye, center, up); // View matrix, defined by eye, center and up.
 glm::mat4 Window::projection; // Projection matrix.
->>>>>>> acbee3d73e4c232f9be79219cc9133200cf989b6
 
 bool Window::initializeProgram()
 {
@@ -320,16 +317,12 @@ void Window::displayCallback(GLFWwindow* window)
 	glUniformMatrix4fv(glGetUniformLocation(programParticles, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 	glUniform2f(glGetUniformLocation(programParticles, "offset"), 1, 1);
 	glUniform4f(glGetUniformLocation(programParticles, "color"), 1, 0, 0, 1);
-<<<<<<< HEAD
 	particleEmitter->draw();
 	*/
-=======
-	//particleEmitter->draw();
 	
 	glUseProgram(curveShader);
 	curve->draw(glm::mat4(1.0f));
 	
->>>>>>> acbee3d73e4c232f9be79219cc9133200cf989b6
 	// Gets events, including input such as keyboard and mouse or window resizing.
 	glfwPollEvents();
 	// Swap buffers.
