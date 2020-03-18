@@ -274,7 +274,7 @@ void Window::idleCallback()
 	}
 
 	// Time variable in shaders
-	glUniform1f(glGetUniformLocation(program, "time"), (float)glfwGetTime() * 0.2f);
+	glUniform1f(glGetUniformLocation(program, "time"),(float)glfwGetTime() * 0.2f);
 	glUniform1f(glGetUniformLocation(programSkybox, "time"), (float)glfwGetTime() * 0.2f);
 	glUniform1f(glGetUniformLocation(programCloud, "time"), (float)glfwGetTime() * 0.2f);
 

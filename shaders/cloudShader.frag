@@ -52,7 +52,8 @@ void main()
 {        
     vec3 position = cloud_pos;
     if (cloud_pos.y < 0){
-        position = -cloud_pos;
+        position = cloud_pos;
+        position.y = -cloud_pos.y;
     }
     
     // Atmosphere Scattering
@@ -60,19 +61,16 @@ void main()
     vec3 extinction = mix(exp(-exp(-((position.y + fsun.y * 4.0) * (exp(-position.y * 16.0) + 0.1) / 80.0) / Br) * (exp(-position.y * 16.0) + 0.1) * Kr / Br) * exp(-position.y * exp(-position.y * 8.0 ) * 4.0) * exp(-position.y * 2.0) * 4.0, vec3(1.0 - exp(fsun.y)) * 0.2, -fsun.y * 0.2 + 0.5);
     FragColor.rgb = 3.0 / (8.0 * 3.14) * (1.0 + mu * mu) * (Kr + Km * (1.0 - g * g) / (2.0 + g * g) / pow(1.0 + g * g - 2.0 * g * mu, 1.5)) / (Br + Bm) * extinction;
 
+    // Cirrus Clouds
+    float density = smoothstep(1.0 - cirrus, 1.0, fbm(position.xyz / position.y * 2.0 + time * 0.05)) * 0.3;
+    FragColor.rgb = mix(FragColor.rgb, extinction * 4.0, density * max(position.y, 0.0));
+
     // Cumulus Clouds
     for (int i = 0; i < 3; i++)
     {
         float density = smoothstep(1.0 - cumulus, 1.0, fbm((0.7 + float(i) * 0.01) * position.xyz / position.y + time * 0.3));
         FragColor.rgb = mix(FragColor.rgb, extinction * density * 5.0, min(density, 1.0) * max(position.y, 0.5));
-    }
-
-
-    // Cirrus Clouds
-    float density = smoothstep(1.0 - cirrus, 1.0, fbm(position.xyz / position.y * 2.0 + time * 0.05)) * 0.3;
-    FragColor.rgb = mix(FragColor.rgb, extinction * 4.0, density * max(position.y, 0.0));
-
-    
+    }    
     // Dithering Noise
-    FragColor.rgb += noise(position * 1000) * 0.01;
+    //FragColor.rgb += noise(position * 1000) * 0.01;
 } 
