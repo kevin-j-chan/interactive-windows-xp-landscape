@@ -27,6 +27,8 @@
 class Window
 {
 public:
+	static glm::mat4 projection;
+	static glm::mat4 view;
 	static bool initializeProgram();
 	static bool initializeObjects();
 	static void cleanUp();
@@ -35,6 +37,7 @@ public:
 	static void idleCallback();
 	static void displayCallback(GLFWwindow*);
 	static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+	static GLuint getCurveShader();
 
 	static void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos);
 };
