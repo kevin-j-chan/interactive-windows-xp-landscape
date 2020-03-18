@@ -35,6 +35,8 @@ public:
     // Instantiate particle emitter with number of particles
     ParticleEmitter::ParticleEmitter(int num_particles);
 
+    ParticleEmitter::~ParticleEmitter();
+
     int ParticleEmitter::firstUnusedParticle();
 
     void ParticleEmitter::respawnParticle(Particle& particle, glm::vec3 pos, glm::vec3 offset);

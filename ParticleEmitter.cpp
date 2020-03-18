@@ -62,6 +62,12 @@ ParticleEmitter::ParticleEmitter(int num_particles) {
      }
 }
 
+ParticleEmitter::~ParticleEmitter() {
+    glDeleteBuffers(2, vbo);
+    glDeleteVertexArrays(1, &vao);
+    glDeleteTextures(1, &textureID);
+}
+
 int ParticleEmitter::firstUnusedParticle()
 {
     for (GLuint i = lastUsedParticle; i < numParticles; ++i) {

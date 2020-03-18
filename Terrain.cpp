@@ -411,6 +411,7 @@ void Chunk::draw()
 	glPrimitiveRestartIndex(ROWS * COLS);
 	glDrawElements(GL_TRIANGLE_STRIP, indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 	glDisable(GL_PRIMITIVE_RESTART);
 }
 
