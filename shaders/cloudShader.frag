@@ -1,13 +1,13 @@
 #version 330 core
 
 in vec3 cloud_pos;
-in vec3 fsun;//= vec3(0,0.05,0.05);
+in vec3 fsun;
 
 out vec4 FragColor;
 
 uniform float time = 0.0;
-uniform float cirrus = 0.8;
-uniform float cumulus = 0.4;
+uniform float cirrus = 0.4;
+uniform float cumulus = 0.8;
 
 uniform float seed = 1;
 

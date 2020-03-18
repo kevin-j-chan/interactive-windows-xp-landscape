@@ -279,17 +279,13 @@ void Window::idleCallback()
 	glUniform1f(glGetUniformLocation(programCloud, "time"), (float)glfwGetTime() * 0.2f);
 
 	// Particle emitter 
-	//particleEmitter->update(glm::vec3(0, 0, 0));
+	particleEmitter->update(glm::vec3(0, 0, 0));
 
 }
 
 void Window::displayCallback(GLFWwindow* window)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
-	
-	
-
 	
 	glUseProgram(programSkybox);
 	glUniformMatrix4fv(glGetUniformLocation(programSkybox, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
@@ -318,9 +314,6 @@ void Window::displayCallback(GLFWwindow* window)
 		glUniformMatrix4fv(glGetUniformLocation(programCloud, "model"), 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
 		cloud->draw();
 	}
-
-
-	
 	
 	/*
 	glUseProgram(programParticles);

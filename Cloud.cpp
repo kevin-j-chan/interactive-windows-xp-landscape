@@ -80,6 +80,7 @@ Cloud::~Cloud() {
 }
 
 void Cloud::draw() {
+
     glDisable(GL_CULL_FACE);
     glDisable(GL_TEXTURE);
     glBindVertexArray(vao);
@@ -90,9 +91,7 @@ void Cloud::draw() {
     else {
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
-    // Unbind from the VAO.
     glBindVertexArray(0);
-
     glEnable(GL_TEXTURE);
 }
 
