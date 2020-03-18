@@ -2,6 +2,7 @@
 
 ParticleEmitter::ParticleEmitter(int num_particles) {
 
+    /*
      GLfloat particle_quad[] = {
      0.0f, 1.0f, 0.0f,
      1.0f, 0.0f, 0.0f,
@@ -10,7 +11,18 @@ ParticleEmitter::ParticleEmitter(int num_particles) {
      0.0f, 1.0f, 0.0f,
      1.0f, 1.0f, 0.0f,
      1.0f, 0.0f, 0.0f,
-     };
+     };*/
+
+
+    GLfloat particle_quad[] = {
+        0.0f, 1.0f, 0.0f, 1.0f,
+        1.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 0.0f, 0.0f,
+
+        0.0f, 1.0f, 0.0f, 1.0f,
+        1.0f, 1.0f, 1.0f, 1.0f,
+        1.0f, 0.0f, 1.0f, 0.0f
+    };
 
      //GLfloat particle_tex[] = {
      //    0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f
@@ -24,8 +36,9 @@ ParticleEmitter::ParticleEmitter(int num_particles) {
      glGenBuffers(2, vbo);
      glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
      glBufferData(GL_ARRAY_BUFFER, sizeof(particle_quad), particle_quad, GL_STATIC_DRAW);
+
      glEnableVertexAttribArray(0);
-     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)0);
      glBindVertexArray(0);
 
      /*
@@ -43,7 +56,7 @@ ParticleEmitter::ParticleEmitter(int num_particles) {
      unsigned char* data = stbi_load("images/particle.png", &width, &height, &comp, 0);
      if (data)
      {
-         std::cout << "Successfully loaded texture." << std::endl;
+         std::cout << "Successfully loaded texture. Comp: " << comp << std::endl;
          if (comp == 3)
              glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
          else if (comp == 4)
@@ -90,7 +103,7 @@ void ParticleEmitter::respawnParticle(Particle& particle, glm::vec3 pos, glm::ve
 {
     GLfloat random = ((rand() % 100) - 50) / 10.0f;
     GLfloat rColor = 0.5 + ((rand() % 100) / 100.0f);
-    particle.position = glm::vec3(pos) + random + offset;
+    particle.position = glm::vec3(pos) + random;
     particle.color = glm::vec4(rColor, rColor, rColor, 1.0f);
     particle.life = 1.0f;
     particle.velocity = pos * 0.1f;
@@ -106,13 +119,13 @@ void ParticleEmitter::draw() {
         {
             if (p.life > 0.0f)
             {
-                glBindTexture(GL_TEXTURE_2D, textureID);
                 glBindVertexArray(vao);
                 glDrawArrays(GL_TRIANGLE_STRIP, 0, 6);// , particles.size());
                 glBindVertexArray(0);
             }
         }
         // Don't forget to reset to default blending mode
+        glDisable(GL_TEXTURE_2D);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 }
