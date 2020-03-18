@@ -22,7 +22,7 @@ private:
 	GLuint curveVao, curveVbo, normalVbo, otherVbo, otherVbo2;
 	GLuint curveShader;
 public:
-	Curve();
+	Curve(int version);
 	void draw(glm::mat4 C);
 	void update();
 	void addPoints(std::vector<glm::vec3> p);

@@ -63,6 +63,7 @@ bool Window::initializeProgram()
 {
 	// Create a shader program with a vertex shader and a fragment shader.
 	program = LoadShaders("shaders/shader.vert", "shaders/shader.frag");
+	curveShader = LoadShaders("shaders/curve.vert", "shaders/curve.frag");
 
 	// Check the shader programs.
 	if (!program)
@@ -303,6 +304,11 @@ void Window::displayCallback(GLFWwindow* window)
 		terrain->draw();
 	}
 	
+	
+
+	glUseProgram(curveShader);
+	curve->draw(glm::mat4(1.0f));
+
 	glUseProgram(programCloud);
 	glUniformMatrix4fv(glGetUniformLocation(programCloud, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 	glUniformMatrix4fv(glGetUniformLocation(programCloud, "view"), 1, GL_FALSE, glm::value_ptr(view));
@@ -320,8 +326,7 @@ void Window::displayCallback(GLFWwindow* window)
 	particleEmitter->draw();
 	*/
 	
-	glUseProgram(curveShader);
-	curve->draw(glm::mat4(1.0f));
+	
 	
 	// Gets events, including input such as keyboard and mouse or window resizing.
 	glfwPollEvents();

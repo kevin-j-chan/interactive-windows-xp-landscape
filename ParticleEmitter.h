@@ -32,22 +32,21 @@ private:
 
 public:
 
-    // Instantiate particle emitter with number of particles
-    ParticleEmitter::ParticleEmitter(int num_particles);
+    ParticleEmitter(int num_particles);
 
-    ParticleEmitter::~ParticleEmitter();
+    ~ParticleEmitter();
 
-    int ParticleEmitter::firstUnusedParticle();
+    int firstUnusedParticle();
 
-    void ParticleEmitter::respawnParticle(Particle& particle, glm::vec3 pos, glm::vec3 offset);
+    void respawnParticle(Particle& particle, glm::vec3 pos, glm::vec3 offset);
 
-    void ParticleEmitter::draw();
+    void draw();
     
     // unused version of update
-    void ParticleEmitter::update();
+    void update();
 
     // our update
-    void ParticleEmitter::update(glm::vec3 pos);
+    void update(glm::vec3 pos);
 };
 
 #endif
