@@ -73,4 +73,6 @@ void main()
 
     // Dithering Noise
     FragColor.rgb += noise(position * 100) * 0.01;    
+
+    ;
 } 

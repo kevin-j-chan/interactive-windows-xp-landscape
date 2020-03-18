@@ -48,7 +48,10 @@ namespace
 
 	Cloud* cloud;
 	ParticleEmitter* particleEmitter;
+	
+	bool pityPoints = false;
 }
+
 
 bool Window::initializeProgram()
 {
@@ -81,7 +84,7 @@ bool Window::initializeProgram()
 		std::cerr << "Failed to initialize shader program" << std::endl;
 		return false;
 	}
-
+	glUniform1f(glGetUniformLocation(programSkybox, "pityPoints"), (int)pityPoints);
 	/* // Program for Particles
 	programParticles = LoadShaders("shaders/particle.vert", "shaders/particle.frag");
 	if (!programParticles)
@@ -274,6 +277,13 @@ void Window::displayCallback(GLFWwindow* window)
 	
 	
 
+	
+	glUseProgram(programSkybox);
+	glUniformMatrix4fv(glGetUniformLocation(programSkybox, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+	glUniformMatrix4fv(glGetUniformLocation(programSkybox, "view"), 1, GL_FALSE, glm::value_ptr(view));
+	glUniformMatrix4fv(glGetUniformLocation(programSkybox, "model"), 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
+	cube->draw();
+	
 	glUseProgram(program);
 	if (drawTerrain) {
 		glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
@@ -283,26 +293,22 @@ void Window::displayCallback(GLFWwindow* window)
 		terrain->draw();
 	}
 	
-	glUseProgram(programSkybox);
-	glUniformMatrix4fv(glGetUniformLocation(programSkybox, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-	glUniformMatrix4fv(glGetUniformLocation(programSkybox, "view"), 1, GL_FALSE, glm::value_ptr(view));
-	glUniformMatrix4fv(glGetUniformLocation(programSkybox, "model"), 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
-	cube->draw();
-
-
-	
 	glUseProgram(programCloud);
 	glUniformMatrix4fv(glGetUniformLocation(programCloud, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 	glUniformMatrix4fv(glGetUniformLocation(programCloud, "view"), 1, GL_FALSE, glm::value_ptr(view));
 	glUniformMatrix4fv(glGetUniformLocation(programCloud, "model"), 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
-	cloud->draw(); 
+	cloud->draw();
+
+
 	
+	
+	/*
 	glUseProgram(programParticles);
 	glUniformMatrix4fv(glGetUniformLocation(programParticles, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 	glUniform2f(glGetUniformLocation(programParticles, "offset"), 1, 1);
 	glUniform4f(glGetUniformLocation(programParticles, "color"), 1, 0, 0, 1);
-	//particleEmitter->draw();
-	
+	particleEmitter->draw();
+	*/
 	// Gets events, including input such as keyboard and mouse or window resizing.
 	glfwPollEvents();
 	// Swap buffers.
@@ -346,7 +352,13 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
 				terrain->generate();
 				break;
 			case GLFW_KEY_C:
-				glUniform1f(glGetUniformLocation(programSkybox, "seed"), rand() % 25);
+				glUniform1f(glGetUniformLocation(programCloud, "seed"), rand() % 25);
+				break;
+			case GLFW_KEY_V: 
+				pityPoints = pityPoints ? false : true;
+				glUniform1f(glGetUniformLocation(programCloud, "pityPoints"), (int)pityPoints);
+				cloud->setPityPoints(pityPoints);
+				std::cout << pityPoints << std::endl;
 				break;
 			case GLFW_KEY_0:
 				drawTerrain = !drawTerrain;

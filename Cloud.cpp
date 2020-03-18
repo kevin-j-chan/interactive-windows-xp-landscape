@@ -49,7 +49,7 @@ Cloud::Cloud() {
     
     // Bind to the VAO.
     glBindVertexArray(vao);
-
+    
     // Bind to the first VBO. We will use it to store the vertices.
     glGenBuffers(2, vbos);
     glBindBuffer(GL_ARRAY_BUFFER, vbos[0]);
@@ -67,7 +67,7 @@ Cloud::Cloud() {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(glm::ivec3) * indices.size(),
         indices.data(), GL_STATIC_DRAW);
 
-    // Unbind from the VBOs. */
+    // Unbind from the VBOs. 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     // Unbind from the VAO.
     glBindVertexArray(0);
@@ -84,12 +84,20 @@ void Cloud::draw() {
     glDisable(GL_TEXTURE);
     glBindVertexArray(vao);
     // elemnt array buffer.
-    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-    //glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, 0);
+    if (!pityPoints)
+
+        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0); 
+    else {
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    }
     // Unbind from the VAO.
     glBindVertexArray(0);
 
     glEnable(GL_TEXTURE);
+}
+
+void Cloud::setPityPoints(bool p) {
+    pityPoints = p;
 }
 
 void Cloud::update() {

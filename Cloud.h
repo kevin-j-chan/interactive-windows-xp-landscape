@@ -25,6 +25,7 @@ private:
 
 	unsigned int texture;
 	
+	bool pityPoints = false;
 
 	std::vector<glm::vec3> vertices;
 	unsigned int layouts;
@@ -35,6 +36,8 @@ public:
 
 	void draw();
 	void update();
+
+	void setPityPoints(bool p);
 };
 
 #endif

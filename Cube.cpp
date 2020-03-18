@@ -80,7 +80,7 @@ Cube::Cube(float size)
 		glm::ivec3(4, 7, 3),
 		// Bottom face.
 		glm::ivec3(6, 5, 1),
-		glm::ivec3(1, 2, 6), */
+		glm::ivec3(1, 2, 6) */
 		
 	};
 
