@@ -11,6 +11,7 @@ namespace
 
 	Cube* cube;	
 	Terrain* terrain;
+	Curve* curve;
 
 	glm::vec3 eye(0, 150, 100); // Camera position.
 	glm::vec3 center(0, 150, 0); // The point we are looking at.
@@ -18,8 +19,8 @@ namespace
 	float fovy = 60;
 	float near = 1;
 	float far = 2000;
-	glm::mat4 view = glm::lookAt(eye, center, up); // View matrix, defined by eye, center and up.
-	glm::mat4 projection; // Projection matrix.
+	//glm::mat4 view = glm::lookAt(eye, center, up); // View matrix, defined by eye, center and up.
+	//glm::mat4 projection; // Projection matrix.
 
 	float yaw = -90.0f;
 	float pitch = 0.0f;
@@ -27,6 +28,7 @@ namespace
 	GLuint program; // The shader program id.
 	GLuint programSkybox;
 	GLuint programCloud;
+	GLuint curveShader;
 	GLuint programParticles;
 
 	GLuint projectionLoc; // Location of projection in shader.
@@ -49,6 +51,9 @@ namespace
 	Cloud* cloud;
 	ParticleEmitter* particleEmitter;
 }
+
+glm::mat4 Window::view = glm::lookAt(eye, center, up); // View matrix, defined by eye, center and up.
+glm::mat4 Window::projection; // Projection matrix.
 
 bool Window::initializeProgram()
 {
@@ -124,6 +129,8 @@ bool Window::initializeObjects()
 	terrain->generate();	
 
 	cloud = new Cloud();
+	
+	curve = new Curve();
 
 	particleEmitter = new ParticleEmitter(500);
 
@@ -303,6 +310,9 @@ void Window::displayCallback(GLFWwindow* window)
 	glUniform4f(glGetUniformLocation(programParticles, "color"), 1, 0, 0, 1);
 	//particleEmitter->draw();
 	
+	glUseProgram(curveShader);
+	curve->draw(glm::mat4(1.0f));
+	
 	// Gets events, including input such as keyboard and mouse or window resizing.
 	glfwPollEvents();
 	// Swap buffers.
@@ -413,4 +423,9 @@ void Window::cursor_pos_callback(GLFWwindow* window, double xpos, double ypos) {
 
 	view = glm::lookAt(eye, center, up);
 
+}
+
+GLuint Window::getCurveShader()
+{
+	return curveShader;
 }
