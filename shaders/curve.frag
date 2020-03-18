@@ -20,11 +20,9 @@ in float surfaceNumber;
 
 out vec4 FragColor;
 
-uniform float time = 0.0f;
-
 void main()
 {
-	vec3 lightDir = vec3(0, 0, -20.0f);
+	vec3 lightDir = vec3(10.0f, 0.0f, -20.0f);
 	vec3 view = vec3(0, 0, -20.0f);
 	float intensity;
 	vec4 color;
