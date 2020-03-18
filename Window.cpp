@@ -9,9 +9,7 @@ namespace
 	int width, height;
 	std::string windowTitle("GLFW Project");
 
-	Object* currentObj1;
-	Cube* cube;
-	
+	Cube* cube;	
 	Terrain* terrain;
 
 	glm::vec3 eye(0, 150, 100); // Camera position.
@@ -28,6 +26,8 @@ namespace
 
 	GLuint program; // The shader program id.
 	GLuint programSkybox;
+	GLuint programCloud;
+	GLuint programParticles;
 
 	GLuint projectionLoc; // Location of projection in shader.
 	GLuint viewLoc; // Location of view in shader.
@@ -42,6 +42,12 @@ namespace
 	bool firstMouse;
 
 	bool drawTerrain = true;
+
+	GLuint timeLoc;
+	float time = 0.0f;
+
+	Cloud* cloud;
+	ParticleEmitter* particleEmitter;
 }
 
 bool Window::initializeProgram()
@@ -58,25 +64,68 @@ bool Window::initializeProgram()
 
 	// Activate the shader program.
 	glUseProgram(program);
-	// Get the locations of uniform variables.
-	projectionLoc = glGetUniformLocation(program, "projection");
-	viewLoc = glGetUniformLocation(program, "view");
-	modelLoc = glGetUniformLocation(program, "model");
-	colorLoc = glGetUniformLocation(program, "color");
-
+	
+	// Program for skybox
 	programSkybox = LoadShaders("shaders/skybox.vert", "shaders/skybox.frag");
 	glUniform1f(glGetUniformLocation(programSkybox, "skybox"), 0);
+	if (!programSkybox)
+	{
+		std::cerr << "Failed to initialize shader program" << std::endl;
+		return false;
+	} 
+
+	// Program for clouds
+	programCloud = LoadShaders("shaders/cloudShader.vert", "shaders/cloudShader.frag");
+	if (!programCloud)
+	{
+		std::cerr << "Failed to initialize shader program" << std::endl;
+		return false;
+	}
+
+	/* // Program for Particles
+	programParticles = LoadShaders("shaders/particle.vert", "shaders/particle.frag");
+	if (!programParticles)
+	{
+		std::cerr << "Failed to initialize shader program" << std::endl;
+		return false;
+	} */
+
+	/*
+	 *	THIS IS SOME LIGHTING STUFF, FEEL FREE TO REMOVE		
+	 */
+
+	/* MATERIAL */
+	glm::vec3 ambient = { 0.2, 0.2, 0.2 };
+	glm::vec3 diffuse = { 0.5, 0.5, 0.5 };
+	glm::vec3 specular = { 0.0, 0.0, 0.0 };
+	glUniform3fv(glGetUniformLocation(program, "material.ambient"), 1, &ambient[0]);
+	glUniform3fv(glGetUniformLocation(program, "material.diffuse"), 1, &diffuse[0]);
+	glUniform3fv(glGetUniformLocation(program, "material.specular"), 1, &specular[0]);
+	glUniform1f(glGetUniformLocation(program, "material.shininess"), 1.0f);
+	
+	/* DIRECTIONAL LIGHT */
+	
+	glm::vec3 dirLightColor = { 1.0f , 1.0f , 1.0f };
+
+	glUniform3fv(glGetUniformLocation(program, "dirLight.color"), 1, &dirLightColor[0]);
+
+	/* VIEW POS */
+	glUniform3fv(glGetUniformLocation(program, "viewPos"), 1, &eye[0]);
 
 	return true;
 }
 
 bool Window::initializeObjects()
 {
+	
 	cube = new Cube(50.0f);
-	currentObj1 = cube;
 
 	terrain = new Terrain();
-	terrain->generate();
+	terrain->generate();	
+
+	cloud = new Cloud();
+
+	//particleEmitter = new ParticleEmitter(500);
 
 	return true;
 }
@@ -85,11 +134,13 @@ void Window::cleanUp()
 {
 	// Deallcoate the objects.
 	delete cube;
-
 	delete terrain;
+	delete cloud;
 	// Delete the shader programs.
 	glDeleteProgram(program);
 	glDeleteProgram(programSkybox);
+	glDeleteProgram(programCloud);
+	//glDeleteProgram(programParticles);
 }
 
 GLFWwindow* Window::createWindow(int width, int height)
@@ -148,7 +199,6 @@ GLFWwindow* Window::createWindow(int width, int height)
 
 	// Call the resize callback to make sure things get drawn immediately.
 	Window::resizeCallback(window, width, height);
-
 	return window;
 }
 
@@ -172,13 +222,11 @@ void Window::resizeCallback(GLFWwindow* window, int w, int h)
 void Window::idleCallback()
 {
 	// Perform any updates as necessary. 
-	currentObj1->update();
-
 	glm::vec3 dir;
 	if (moveForward) {
 		dir = center - eye;
 		dir = glm::normalize(dir);
-		dir *= 0.01;
+		dir *= 0.1;
 		eye += dir;
 		center += dir;
 		view = glm::lookAt(eye, center, up);
@@ -186,7 +234,7 @@ void Window::idleCallback()
 	if (moveBack) {
 		dir = center - eye;
 		dir = glm::normalize(dir);
-		dir *= 0.01;
+		dir *= 0.1;
 		eye -= dir;
 		center -= dir;
 		view = glm::lookAt(eye, center, up);
@@ -194,7 +242,7 @@ void Window::idleCallback()
 	if (moveLeft) {
 		dir = center - eye;
 		dir = glm::normalize(glm::cross(dir, up));
-		dir *= 0.01;
+		dir *= 0.1;
 		eye -= dir;
 		center -= dir;
 		view = glm::lookAt(eye, center, up);
@@ -202,35 +250,56 @@ void Window::idleCallback()
 	if (moveRight) {
 		dir = center - eye;
 		dir = glm::normalize(glm::cross(dir, up));
-		dir *= 0.01;
+		dir *= 0.1;
 		eye += dir;
 		center += dir;
 		view = glm::lookAt(eye, center, up);
 	}
+
+	// Time variable in shaders
+	glUniform1f(glGetUniformLocation(program, "time"), (float)glfwGetTime() * 0.2f);
+	glUniform1f(glGetUniformLocation(programSkybox, "time"), (float)glfwGetTime() * 0.2f);
+	glUniform1f(glGetUniformLocation(programCloud, "time"), (float)glfwGetTime() * 0.2f);
+
+	// Particle emitter 
+	//particleEmitter->update(glm::vec3(0, 0, 0));
+
 }
 
 void Window::displayCallback(GLFWwindow* window)
 {
-
-	glUseProgram(program);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
-	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+	
+	glUseProgram(program);
 
 	if (drawTerrain) {
-		glm::mat4 model = glm::mat4(1);
-		model = glm::scale(glm::vec3(256.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, glm::value_ptr(view));
+		glm::mat4 model = glm::scale(glm::mat4(1), glm::vec3(256));
+		glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 		terrain->draw();
 	}
-
+	
 	glUseProgram(programSkybox);
 	glUniformMatrix4fv(glGetUniformLocation(programSkybox, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 	glUniformMatrix4fv(glGetUniformLocation(programSkybox, "view"), 1, GL_FALSE, glm::value_ptr(view));
 	glUniformMatrix4fv(glGetUniformLocation(programSkybox, "model"), 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
-	currentObj1->draw();
+	cube->draw();
 
+	
+	glUseProgram(programCloud);
+	glUniformMatrix4fv(glGetUniformLocation(programCloud, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+	glUniformMatrix4fv(glGetUniformLocation(programCloud, "view"), 1, GL_FALSE, glm::value_ptr(view));
+	glUniformMatrix4fv(glGetUniformLocation(programCloud, "model"), 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
+	cloud->draw(); 
+
+	/*
+	glUseProgram(programParticles);
+	glUniformMatrix4fv(glGetUniformLocation(programParticles, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+	glUniform2f(glGetUniformLocation(programParticles, "offset"), 1, 1);
+	glUniform4f(glGetUniformLocation(programParticles, "color"), 1, 0, 0, 1);
+	particleEmitter->draw();*/
+	
 	// Gets events, including input such as keyboard and mouse or window resizing.
 	glfwPollEvents();
 	// Swap buffers.
@@ -258,8 +327,6 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
 				// Close the window. This causes the program to also terminate.
 				glfwSetWindowShouldClose(window, GL_TRUE);
 				break;
-
-
 			case GLFW_KEY_W:
 				moveForward = true;
 				break;
@@ -274,6 +341,9 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
 				break;
 			case GLFW_KEY_T:
 				terrain->generate();
+				break;
+			case GLFW_KEY_C:
+				glUniform1f(glGetUniformLocation(programSkybox, "seed"), rand() % 25);
 				break;
 			case GLFW_KEY_0:
 				drawTerrain = !drawTerrain;

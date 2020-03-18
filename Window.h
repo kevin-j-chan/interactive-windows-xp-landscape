@@ -21,6 +21,8 @@
 #include "Cube.h"
 #include "shader.h"
 #include "Terrain.h"
+#include "ParticleEmitter.h"
+#include "Cloud.h"
 
 class Window
 {

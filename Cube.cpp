@@ -42,6 +42,7 @@ Cube::Cube(float size)
 	// and v3 in counter-clockwise order.
 	std::vector<glm::ivec3> indices
 	{
+		 // REVERSE FACES
 		// Front face.
 		glm::ivec3(0, 2, 1),
 		glm::ivec3(2, 0, 3),
@@ -59,9 +60,9 @@ Cube::Cube(float size)
 		glm::ivec3(3, 4, 7),
 		// Bottom face.
 		glm::ivec3(1, 6, 5),
-		glm::ivec3(6, 1, 2),
-
-		/*
+		glm::ivec3(6, 1, 2)
+		
+		/* // FORWARD FACES
 		// Front face.
 		glm::ivec3(2, 1, 0),
 		glm::ivec3(0, 3, 2),
@@ -80,9 +81,10 @@ Cube::Cube(float size)
 		// Bottom face.
 		glm::ivec3(6, 5, 1),
 		glm::ivec3(1, 2, 6), */
+		
 	};
 
-
+	
 	// Bind textures
 	std::vector<std::string> faces = {
 		"images/right.jpg",
@@ -93,10 +95,8 @@ Cube::Cube(float size)
 		"images/back.jpg"
 	};
 
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
 	textureID = loadCubemap(faces);
-
+	
 	// Generate a vertex array (VAO) and two vertex buffer objects (VBO).
 	glGenVertexArrays(1, &vao);
 	glGenBuffers(2, vbos);
@@ -120,10 +120,11 @@ Cube::Cube(float size)
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(glm::ivec3) * indices.size(),
 		indices.data(), GL_STATIC_DRAW);
 
-	// Unbind from the VBOs.
+	// Unbind from the VBO.
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	// Unbind from the VAO.
 	glBindVertexArray(0);
+
 }
 
 Cube::~Cube()
@@ -136,20 +137,28 @@ Cube::~Cube()
 
 void Cube::draw()
 {
-
+	
 	// Bind to the VAO.
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
 	glBindVertexArray(vao);
 	// Draw triangles using the indices in the second VBO, which is an 
 	// elemnt array buffer.
+	glEnable(GL_TEXTURE_CUBE_MAP);
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+	glDisable(GL_TEXTURE_CUBE_MAP);
+	
 	// Unbind from the VAO.
 	glBindVertexArray(0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+	glDisable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 }
 
 void Cube::update()
 {
-	// Spin the cube by 1 degree.
-	spin(0.1f);
+
 }
 
 void Cube::spin(float deg)
