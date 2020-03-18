@@ -23,6 +23,7 @@
 #include "Terrain.h"
 #include "ParticleEmitter.h"
 #include "Cloud.h"
+#include "Curve.h"
 
 class Window
 {
