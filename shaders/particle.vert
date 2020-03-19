@@ -16,6 +16,6 @@ void main()
 {
     float scale = 5.0f;
     TexCoords = vertex.zw;
-    ParticleColor = color;
+    ParticleColor = vec4( 1.0, 0.0, 1.0, 1.0 );
     gl_Position = projection * view * model * vec4((vertex.xy * scale), 0.0, 1.0);
 }

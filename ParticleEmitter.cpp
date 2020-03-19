@@ -3,18 +3,8 @@
 
 ParticleEmitter::ParticleEmitter(int num_particles) {
 
-    /*
-     GLfloat particle_quad[] = {
-     0.0f, 1.0f, 0.0f,
-     1.0f, 0.0f, 0.0f,
-     0.0f, 0.0f, 0.0f,
-
-     0.0f, 1.0f, 0.0f,
-     1.0f, 1.0f, 0.0f,
-     1.0f, 0.0f, 0.0f,
-     };*/
-
-
+    
+     
     GLfloat particle_quad[] = {
         0.0f, 1.0f, 0.0f, 1.0f,
         1.0f, 0.0f, 1.0f, 0.0f,
@@ -24,10 +14,6 @@ ParticleEmitter::ParticleEmitter(int num_particles) {
         1.0f, 1.0f, 1.0f, 1.0f,
         1.0f, 0.0f, 1.0f, 0.0f
     };
-
-     //GLfloat particle_tex[] = {
-     //    0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f
-     //};
 
      // generate vertex array
      glGenVertexArrays(1, &vao);
@@ -121,7 +107,7 @@ void ParticleEmitter::draw() {
             if (p.life > 0.0f)
             {
                 glUniform3fv(program, 1, glm::value_ptr(p.position));
-                glUniform3fv(program, 1, glm::value_ptr(p.color));
+                glUniform3fv(program, 1, glm::value_ptr(glm::vec3( ((rand() % 255) / 255) , ((rand() % 255) / 255), ((rand() % 255) / 255))));
                 glBindVertexArray(vao);
                 glDrawArrays(GL_TRIANGLES, 0, 6);// , particles.size());
                 glBindVertexArray(0);
