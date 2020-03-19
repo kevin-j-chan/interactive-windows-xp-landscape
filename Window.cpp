@@ -51,11 +51,16 @@ namespace
 	float time = 0.0f;
 
 	Cloud* cloud;
-	ParticleEmitter* particleEmitter;
+	ParticleEmitter* particleEmitterY;
+	ParticleEmitter* particleEmitterB;
+	ParticleEmitter* particleEmitterG;
+	ParticleEmitter* particleEmitterR;
 	
 	bool pityPoints = false;
 	bool hideClouds = false;
 	bool hideParticles = true;
+
+	unsigned int particleTime;
 }
 
 glm::mat4 Window::view = glm::lookAt(eye, center, up); // View matrix, defined by eye, center and up.
@@ -142,8 +147,15 @@ bool Window::initializeObjects()
 	curveTech = new Curve(1);
 	curve = curveSmooth;
 
-	particleEmitter = new ParticleEmitter(1);
-	particleEmitter->setProgram(programParticles);
+	particleEmitterY = new ParticleEmitter(20, glm::vec4(1,1,0,1));
+	particleEmitterR = new ParticleEmitter(20, glm::vec4(1, 0, 0, 1));
+	particleEmitterG = new ParticleEmitter(20, glm::vec4(0, 1, 0, 1));
+	particleEmitterB = new ParticleEmitter(20, glm::vec4(0, 0, 1, 1));
+
+	particleEmitterY->setProgram(programParticles);
+	particleEmitterR->setProgram(programParticles);
+	particleEmitterG->setProgram(programParticles);
+	particleEmitterB->setProgram(programParticles);
 
 	return true;
 }
@@ -154,7 +166,10 @@ void Window::cleanUp()
 	delete cube;
 	delete terrain;
 	delete cloud;
-	delete particleEmitter;
+	delete particleEmitterY;
+	delete particleEmitterR;
+	delete particleEmitterG;
+	delete particleEmitterB;
 	// Delete the shader programs.
 	glDeleteProgram(program);
 	glDeleteProgram(programSkybox);
@@ -281,8 +296,13 @@ void Window::idleCallback()
 	glUniform1f(glGetUniformLocation(programCloud, "time"), (float)glfwGetTime() * 0.2f);
 
 	// Particle emitter 
-	if(!hideParticles)
-		particleEmitter->update(glm::vec3(0, 20, 0));
+	if (!hideParticles && ++time > 50) {
+		particleEmitterY->update(glm::vec3(10, 23, -2));
+		particleEmitterR->update(glm::vec3(0, 27, 0));
+		particleEmitterG->update(glm::vec3(10, 27, -2));
+		particleEmitterB->update(glm::vec3(0, 23, 0));
+		time = 0;
+	}
 
 }
 
@@ -315,8 +335,11 @@ void Window::displayCallback(GLFWwindow* window)
 		glUseProgram(programParticles);
 		glUniformMatrix4fv(glGetUniformLocation(programParticles, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 		glUniformMatrix4fv(glGetUniformLocation(programParticles, "view"), 1, GL_FALSE, glm::value_ptr(view));
-		glUniformMatrix4fv(glGetUniformLocation(programParticles, "model"), 1, GL_FALSE, glm::value_ptr(glm::translate(glm::mat4(1.0f), glm::vec3(0, 200, 0))));
-		particleEmitter->draw();
+		glUniformMatrix4fv(glGetUniformLocation(programParticles, "model"), 1, GL_FALSE, glm::value_ptr(glm::translate(glm::mat4(1.0f), glm::vec3(-25, 100, -20))));
+		particleEmitterY->draw();
+		particleEmitterR->draw();
+		particleEmitterG->draw();
+		particleEmitterB->draw();
 	}
 
 	if (!hideClouds) {

@@ -1,9 +1,9 @@
 #include "ParticleEmitter.h"
 #include <glm\gtc\type_ptr.hpp>
 
-ParticleEmitter::ParticleEmitter(int num_particles) {
+ParticleEmitter::ParticleEmitter(int num_particles, glm::vec4 color) {
 
-    
+    this->color = color;
      
     GLfloat particle_quad[] = {
         0.0f, 1.0f, 0.0f, 1.0f,
@@ -84,9 +84,10 @@ void ParticleEmitter::respawnParticle(Particle& particle, glm::vec3 pos, glm::ve
 {
     GLfloat random = (rand() % 20);
     GLfloat rColor = ((rand() % 100) / 100);
-    particle.position = glm::vec3(pos) + random;
+    particle.position = pos + offset + random;
     particle.color = glm::vec4(rColor, rColor, rColor, 1.0f);
     particle.life = 1.0f;
+    //std::cout << "respawn particle" << std::endl;
 }
 
 void ParticleEmitter::draw() {
@@ -100,7 +101,7 @@ void ParticleEmitter::draw() {
             if (p.life > 0.0f)
             {
                 glUniform3fv(glGetUniformLocation(program, "offset"), 1, glm::value_ptr(p.position));
-                glUniform4fv(glGetUniformLocation(program, "color"), 1, glm::value_ptr(glm::vec4( ((rand() % 255) / 255) , ((rand() % 255) / 255), ((rand() % 255) / 255), 1)));
+                glUniform4fv(glGetUniformLocation(program, "color"), 1, glm::value_ptr(color));
                 glUniform1f(glGetUniformLocation(program, "scale"), p.life);
                 glBindVertexArray(vao);
                 glDrawArrays(GL_TRIANGLES, 0, 6);// , particles.size());
@@ -138,6 +139,7 @@ void ParticleEmitter::update(glm::vec3 pos)
             p.position -= p.velocity * dt;
             // reduce opacity of particle
             p.color.a -= dt * 2.5;
+            //std::cout << p.life << std::endl;
         }
     }
 }
