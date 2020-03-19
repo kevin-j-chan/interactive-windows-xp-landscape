@@ -87,6 +87,7 @@ void ParticleEmitter::respawnParticle(Particle& particle, glm::vec3 pos, glm::ve
     particle.position = pos + offset + random;
     particle.color = glm::vec4(rColor, rColor, rColor, 1.0f);
     particle.life = 1.0f;
+    particle.velocity = glm::vec3((10 * ((rand() % 100) / 100) - 1), 5.0f, (10 * ((rand() % 100) / 100) - 1));
     //std::cout << "respawn particle" << std::endl;
 }
 
@@ -136,9 +137,10 @@ void ParticleEmitter::update(glm::vec3 pos)
         p.life -= dt;
         if (p.life > 0.0f)
         {	// particle is alive, thus update
-            p.position -= p.velocity * dt;
+            p.position -= p.velocity * (20 * dt);
             // reduce opacity of particle
             p.color.a -= dt * 2.5;
+           
             //std::cout << p.life << std::endl;
         }
     }

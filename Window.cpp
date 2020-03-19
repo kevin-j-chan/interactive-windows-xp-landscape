@@ -49,18 +49,19 @@ namespace
 
 	GLuint timeLoc;
 	float time = 0.0f;
+	float timeT = 0.0f;
 
 	Cloud* cloud;
 	ParticleEmitter* particleEmitterY;
 	ParticleEmitter* particleEmitterB;
 	ParticleEmitter* particleEmitterG;
 	ParticleEmitter* particleEmitterR;
-	
+	ParticleEmitter* particleEmitterTest;
+
 	bool pityPoints = false;
 	bool hideClouds = false;
 	bool hideParticles = true;
-
-	unsigned int particleTime;
+	bool hideTestParticle = true;
 }
 
 glm::mat4 Window::view = glm::lookAt(eye, center, up); // View matrix, defined by eye, center and up.
@@ -147,15 +148,17 @@ bool Window::initializeObjects()
 	curveTech = new Curve(1);
 	curve = curveSmooth;
 
-	particleEmitterY = new ParticleEmitter(20, glm::vec4(1,1,0,1));
-	particleEmitterR = new ParticleEmitter(20, glm::vec4(1, 0, 0, 1));
-	particleEmitterG = new ParticleEmitter(20, glm::vec4(0, 1, 0, 1));
-	particleEmitterB = new ParticleEmitter(20, glm::vec4(0, 0, 1, 1));
+	particleEmitterY = new ParticleEmitter(55, glm::vec4(1,1,0,1));
+	particleEmitterR = new ParticleEmitter(55, glm::vec4(1, 0, 0, 1));
+	particleEmitterG = new ParticleEmitter(55, glm::vec4(0, 1, 0, 1));
+	particleEmitterB = new ParticleEmitter(55, glm::vec4(0, 0, 1, 1));
+	particleEmitterTest = new ParticleEmitter(1, glm::vec4(1, 1, 1, 1));
 
 	particleEmitterY->setProgram(programParticles);
 	particleEmitterR->setProgram(programParticles);
 	particleEmitterG->setProgram(programParticles);
 	particleEmitterB->setProgram(programParticles);
+	particleEmitterTest->setProgram(programParticles);
 
 	return true;
 }
@@ -297,11 +300,15 @@ void Window::idleCallback()
 
 	// Particle emitter 
 	if (!hideParticles && ++time > 50) {
-		particleEmitterY->update(glm::vec3(10, 23, -2));
+		particleEmitterY->update(glm::vec3(10, 23, -4));
 		particleEmitterR->update(glm::vec3(0, 27, 0));
-		particleEmitterG->update(glm::vec3(10, 27, -2));
+		particleEmitterG->update(glm::vec3(10, 27, -4));
 		particleEmitterB->update(glm::vec3(0, 23, 0));
 		time = 0;
+	}
+	if (!hideTestParticle && ++timeT > 50) {
+		particleEmitterTest->update(glm::vec3(0, 80, 0));
+		timeT = 0;
 	}
 
 }
@@ -341,6 +348,13 @@ void Window::displayCallback(GLFWwindow* window)
 		particleEmitterG->draw();
 		particleEmitterB->draw();
 	}
+	if (!hideTestParticle) {
+		glUseProgram(programParticles);
+		glUniformMatrix4fv(glGetUniformLocation(programParticles, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		glUniformMatrix4fv(glGetUniformLocation(programParticles, "view"), 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(glGetUniformLocation(programParticles, "model"), 1, GL_FALSE, glm::value_ptr(glm::translate(glm::mat4(1.0f), glm::vec3(-25, 100, -20))));
+		particleEmitterTest->draw();
+	}
 
 	if (!hideClouds) {
 		glUseProgram(programCloud);
@@ -370,6 +384,15 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
 		// Uppercase key presses (shift held down + key press)
 		if (mods == GLFW_MOD_SHIFT) {
 			switch (key) {
+			case GLFW_KEY_P:
+				hideTestParticle = !hideTestParticle;
+				break;
+			case GLFW_KEY_C:
+				pityPoints = pityPoints ? false : true;
+				glUniform1f(glGetUniformLocation(programCloud, "pityPoints"), (int)pityPoints);
+				cloud->setPityPoints(pityPoints);
+				std::cout << pityPoints << std::endl;
+				break;
 			default:
 				break;
 			}
@@ -403,12 +426,6 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
 				break;
 			case GLFW_KEY_C:
 				glUniform1f(glGetUniformLocation(programCloud, "seed"), rand() % 25);
-				break;
-			case GLFW_KEY_V: 
-				pityPoints = pityPoints ? false : true;
-				glUniform1f(glGetUniformLocation(programCloud, "pityPoints"), (int)pityPoints);
-				cloud->setPityPoints(pityPoints);
-				std::cout << pityPoints << std::endl;
 				break;
 			case GLFW_KEY_0:
 				drawTerrain = !drawTerrain;

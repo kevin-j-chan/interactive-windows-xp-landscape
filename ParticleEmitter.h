@@ -27,7 +27,7 @@ private:
     GLuint program;
 
     glm::vec4 color = glm::vec4(1.0, 1, 1, 1);
-    float dt = 0.05;
+    float dt = 0.01;
     int numParticles;
     int lastUsedParticle = 0;
     std::vector<Particle> particles;
