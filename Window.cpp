@@ -142,7 +142,7 @@ bool Window::initializeObjects()
 	curveTech = new Curve(1);
 	curve = curveSmooth;
 
-	particleEmitter = new ParticleEmitter(500);
+	particleEmitter = new ParticleEmitter(1);
 	particleEmitter->setProgram(programParticles);
 
 	return true;
@@ -281,7 +281,8 @@ void Window::idleCallback()
 	glUniform1f(glGetUniformLocation(programCloud, "time"), (float)glfwGetTime() * 0.2f);
 
 	// Particle emitter 
-	particleEmitter->update(glm::vec3(0, 20, 0));
+	if(!hideParticles)
+		particleEmitter->update(glm::vec3(0, 20, 0));
 
 }
 
@@ -315,8 +316,6 @@ void Window::displayCallback(GLFWwindow* window)
 		glUniformMatrix4fv(glGetUniformLocation(programParticles, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 		glUniformMatrix4fv(glGetUniformLocation(programParticles, "view"), 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(glGetUniformLocation(programParticles, "model"), 1, GL_FALSE, glm::value_ptr(glm::translate(glm::mat4(1.0f), glm::vec3(0, 200, 0))));
-		//glUniform2f(glGetUniformLocation(programParticles, "offset"), 1, 1);
-		//glUniform4f(glGetUniformLocation(programParticles, "color"), 1, 0, 0, 1);
 		particleEmitter->draw();
 	}
 

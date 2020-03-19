@@ -15,7 +15,7 @@ struct Particle {
     GLfloat life = 1.0f;
 
     Particle()
-        : position(4.0f), velocity(0.0f), color(1.0f), life(1.0f) { }
+        : position(4.0f), velocity(glm::vec3((((rand() % 100) / 100) - 1) / 10, 0.01f, (((rand() % 100) / 100) - 1) / 10)), color(1.0f), life(1.0f) { }
 };
 
 class ParticleEmitter : public Object {
@@ -26,7 +26,7 @@ private:
     GLuint textureID;
     GLuint program;
 
-    float dt = 0.05;
+    float dt = 0.00001;
     int numParticles;
     int lastUsedParticle = 0;
     std::vector<Particle> particles;

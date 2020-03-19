@@ -28,12 +28,6 @@ ParticleEmitter::ParticleEmitter(int num_particles) {
      glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)0);
      glBindVertexArray(0);
 
-     /*
-     glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
-     glBufferData(GL_ARRAY_BUFFER, sizeof(particle_tex), particle_tex, GL_STATIC_DRAW);
-     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
-     glBindVertexArray(1);*/
-
      // generate texture
      glGenTextures(1, &textureID);
      glBindTexture(GL_TEXTURE_2D, textureID);
@@ -89,11 +83,10 @@ int ParticleEmitter::firstUnusedParticle()
 void ParticleEmitter::respawnParticle(Particle& particle, glm::vec3 pos, glm::vec3 offset)
 {
     GLfloat random = (rand() % 20);
-    GLfloat rColor = 0.5 + ((rand() % 100) / 100.0f);
+    GLfloat rColor = ((rand() % 100) / 100);
     particle.position = glm::vec3(pos) + random;
     particle.color = glm::vec4(rColor, rColor, rColor, 1.0f);
     particle.life = 1.0f;
-    particle.velocity = pos * 0.1f;
 }
 
 void ParticleEmitter::draw() {
@@ -106,8 +99,9 @@ void ParticleEmitter::draw() {
         {
             if (p.life > 0.0f)
             {
-                glUniform3fv(program, 1, glm::value_ptr(p.position));
-                glUniform3fv(program, 1, glm::value_ptr(glm::vec3( ((rand() % 255) / 255) , ((rand() % 255) / 255), ((rand() % 255) / 255))));
+                glUniform3fv(glGetUniformLocation(program, "offset"), 1, glm::value_ptr(p.position));
+                glUniform4fv(glGetUniformLocation(program, "color"), 1, glm::value_ptr(glm::vec4( ((rand() % 255) / 255) , ((rand() % 255) / 255), ((rand() % 255) / 255), 1)));
+                glUniform1f(glGetUniformLocation(program, "scale"), p.life);
                 glBindVertexArray(vao);
                 glDrawArrays(GL_TRIANGLES, 0, 6);// , particles.size());
                 glBindVertexArray(0);
