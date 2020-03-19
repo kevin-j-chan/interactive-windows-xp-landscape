@@ -1,4 +1,5 @@
 #include "ParticleEmitter.h"
+#include <glm\gtc\type_ptr.hpp>
 
 ParticleEmitter::ParticleEmitter(int num_particles) {
 
@@ -101,7 +102,7 @@ int ParticleEmitter::firstUnusedParticle()
 
 void ParticleEmitter::respawnParticle(Particle& particle, glm::vec3 pos, glm::vec3 offset)
 {
-    GLfloat random = ((rand() % 100) - 50) / 10.0f;
+    GLfloat random = (rand() % 20);
     GLfloat rColor = 0.5 + ((rand() % 100) / 100.0f);
     particle.position = glm::vec3(pos) + random;
     particle.color = glm::vec4(rColor, rColor, rColor, 1.0f);
@@ -119,8 +120,10 @@ void ParticleEmitter::draw() {
         {
             if (p.life > 0.0f)
             {
+                glUniform3fv(program, 1, glm::value_ptr(p.position));
+                glUniform3fv(program, 1, glm::value_ptr(p.color));
                 glBindVertexArray(vao);
-                glDrawArrays(GL_TRIANGLE_STRIP, 0, 6);// , particles.size());
+                glDrawArrays(GL_TRIANGLES, 0, 6);// , particles.size());
                 glBindVertexArray(0);
             }
         }

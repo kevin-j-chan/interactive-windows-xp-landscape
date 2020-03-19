@@ -22,10 +22,11 @@ void main()
         cloud_pos = transpose(mat3(view)) * (inverse(projection) * gl_Position).xyz;
     }
     else {
-        gl_Position = projection * view * model * vec4(aPos, 1.0); //normalize(projection * view * model * vec4(aPos, 1.0));
+        //gl_Position = projection * view * model * vec4(aPos, 1.0); //
+        gl_Position = normalize(projection * view * model * vec4(aPos, 1.0));
         //cloud_pos = normalize(aPos);
-        cloud_pos = normalize(transpose(mat3(view)) * (inverse(projection) * gl_Position).xyz);
-        //cloud_pos = transpose(mat3(projection)) * (inverse(view) * gl_Position).xyz;
+        //cloud_pos = normalize(transpose(mat3(view)) * (inverse(projection) * gl_Position).xyz);
+        cloud_pos = transpose(mat3(view)) * (inverse(projection) * gl_Position).xyz;
     
     }
     

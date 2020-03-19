@@ -7,7 +7,7 @@ out vec4 FragColor;
 
 uniform float time = 0.0;
 uniform float cirrus = 0.4;
-uniform float cumulus = 0.8;
+uniform float cumulus = 0.6;
 
 uniform float seed = 1;
 
@@ -56,13 +56,15 @@ void main()
     if (cloud_pos.y < 0){
         position = cloud_pos;
         position.y = -cloud_pos.y;
+        
     }
     
     // Atmosphere Scattering
     float mu = dot(normalize(position), normalize(fsun));
-    vec3 extinction = mix(exp(-exp(-((position.y + fsun.y * 4.0) * (exp(-position.y * 16.0) + 0.1) / 80.0) / Br) * (exp(-position.y * 16.0) + 0.1) * Kr / Br) * exp(-position.y * exp(-position.y * 8.0 ) * 4.0) * exp(-position.y * 2.0) * 4.0, vec3(1.0 - exp(fsun.y)) * 0.2, -fsun.y * 0.2 + 0.5);
+    vec3 extinction = 0.5 * mix(exp(-exp(-((position.y + fsun.y * 4.0) * (exp(-position.y * 16.0) + 0.1) / 80.0) / Br) * (exp(-position.y * 16.0) + 0.1) * Kr / Br) * exp(-position.y * exp(-position.y * 8.0 ) * 4.0) * exp(-position.y * 2.0) * 4.0, vec3(1.0 - exp(fsun.y)) * 0.2, -fsun.y * 0.2 + 0.5);
     FragColor.rgb = 3.0 / (8.0 * 3.14) * (1.0 + mu * mu) * (Kr + Km * (1.0 - g * g) / (2.0 + g * g) / pow(1.0 + g * g - 2.0 * g * mu, 1.5)) / (Br + Bm) * extinction;
-    bottomColor = FragColor.rgb;
+ 
+   
 
 
     // Cirrus Clouds
@@ -78,8 +80,4 @@ void main()
     
     // Dithering Noise
     FragColor.rgb += noise(position * 1000) * 0.01;
-
-    if(cloud_pos.y < 0){
-        FragColor.rgb = bottomColor;
-    }
 } 
